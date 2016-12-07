@@ -61,7 +61,7 @@ function getAltStatus(target, alt, callback) {
       callback(body.errorMessage);
     }
     else {
-      callback(null, body.availableProfiles[0].id);
+      callback(null, body.availableProfiles[0].name);
     }
   });
 }
@@ -71,8 +71,8 @@ function getAltStatus(target, alt, callback) {
  * Utils
  */
 
- function randomString(length)
- {
+ function randomString(length) {
+
     var text = "";
     var dictionnary = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -80,6 +80,31 @@ function getAltStatus(target, alt, callback) {
       text += dictionnary.charAt(Math.floor(Math.random() * dictionnary.length));
 
     return text;
+ }
+
+ function getUUIDWithDash(uuid) {
+
+   return uuid.replace(/([0-9a-fA-F]{8})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]+)/, '$1-$2-$3-$4-$5');
+ }
+
+ function getUUIDWithName(name, callback) {
+
+   request({
+     url: 'https://api.mojang.com/profiles/minecraft',
+     method: 'post',
+     body: [
+       name
+     ],
+     json: true
+   }, function (err, res, body) {
+
+     if (err) {
+       callback(err);
+     }
+     else {
+       callback(null, getUUIDWithDash(body[0].id));
+     }
+   });
  }
 
 
@@ -100,7 +125,7 @@ function getAltStatus(target, alt, callback) {
        });
      }
      else {
-       getAltStatus(target, req.params.alt, function (err, uuid) {
+       getAltStatus(target, req.params.alt, function (err, name) {
 
          if (err) {
            res.json({
@@ -109,25 +134,36 @@ function getAltStatus(target, alt, callback) {
            });
          }
          else {
-           var isPresent = db.get('players').find(function (o) {
-             return o == uuid;
-           }).value();
+           getUUIDWithName(name, function (err, uuid) {
 
-           if (isPresent) {
-             res.json({
-               status: 'error',
-               error: 'This hacked account is already in the database!'
-             });
-           }
-           else {
-             db.get('players').push(uuid).value();
+             if (err) {
+               res.json({
+                 status: 'error',
+                 error: err
+               });
+             }
+             else {
+               var isPresent = db.get('players').find(function (o) {
+                 return o == uuid;
+               }).value();
 
-             console.log('Added in the database: ' + uuid + ' (ALT-Token: ' + req.params.alt + ')');
+               if (isPresent) {
+                 res.json({
+                   status: 'error',
+                   error: 'This hacked account is already in the database!'
+                 });
+               }
+               else {
+                 db.get('players').push(uuid).value();
 
-             res.json({
-               status: 'ok'
-             });
-           }
+                 console.log('Added in the database: ' + uuid + ' (ALT-Token: ' + req.params.alt + ')');
+
+                 res.json({
+                   status: 'ok'
+                 });
+               }
+             }
+           });
          }
        });
      }
@@ -143,6 +179,15 @@ function getAltStatus(target, alt, callback) {
 
      res.json({
        exists: (isExisting ? 'true' : 'false')
+     });
+
+     next();
+   });
+
+   server.get('/api/stats', function (req, res, next) {
+
+     res.json({
+       players: db.get('players').size().value()
      });
 
      next();
