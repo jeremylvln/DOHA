@@ -43,5 +43,5 @@ send a request to:
 https://doha.blueslime.fr/api/ban/<ALT-TOKEN>
 ```
 
-If the token is still valid, the account will be added to the database in the next 5
-minutes.
+If the token is still valid, the account will be added to the database and be blacklisted
+immediately (it can take 1 hour to update this repository - crontab yee).
