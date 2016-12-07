@@ -137,12 +137,12 @@ function getAltStatus(target, alt, callback) {
 
    server.get('/api/check/:uuid', function (req, res, next) {
 
-     var isPresent = db.get('players').find(function (o) {
+     var isExisting = db.get('players').find(function (o) {
        return o == req.params.uuid;
      }).value();
 
      res.json({
-       present: (isPresent ? 'true' : 'false')
+       exists: (isExisting ? 'true' : 'false')
      });
 
      next();
