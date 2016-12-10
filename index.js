@@ -1,10 +1,10 @@
 /**
- * Copyright © 2016 Jérémy L. (BlueSlime)
- * This work is free. You can redistribute it and/or modify it under the
- * terms of the Do What The Fuck You Want To Public License, Version 2,
- * as published by Sam Hocevar. See the COPYING file or http://www.wtfpl.net/
- * for more details.
- */
+* Copyright © 2016 Jérémy L. (BlueSlime)
+* This work is free. You can redistribute it and/or modify it under the
+* terms of the Do What The Fuck You Want To Public License, Version 2,
+* as published by Sam Hocevar. See the COPYING file or http://www.wtfpl.net/
+* for more details.
+*/
 
 var fs = require('fs');
 var restify = require('restify');
@@ -19,8 +19,8 @@ db.defaults({ players: [] }).value();
 
 
 /**
- * MCLeaks's API related
- */
+* MCLeaks's API related
+*/
 
 function getAPIAddress(callback) {
 
@@ -32,11 +32,10 @@ function getAPIAddress(callback) {
     if (err || !body.serverip) {
       console.err('Failed to retreive the MCLeaks\'s fake login server!');
       process.exit(1);
-
-      return;
     }
-
-    callback(body.serverip);
+    else {
+      callback(body.serverip);
+    }
   });
 }
 
@@ -68,136 +67,145 @@ function getAltStatus(target, alt, callback) {
 
 
 /*
- * Utils
- */
+* Utils
+*/
 
- function randomString(length) {
+function randomString(length) {
 
-    var text = "";
-    var dictionnary = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var text = "";
+  var dictionnary = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    for (var i = 0; i < length; i++)
-      text += dictionnary.charAt(Math.floor(Math.random() * dictionnary.length));
+  for (var i = 0; i < length; i++)
+    text += dictionnary.charAt(Math.floor(Math.random() * dictionnary.length));
 
-    return text;
- }
+  return text;
+}
 
- function getUUIDWithDash(uuid) {
+function getUUIDWithDash(uuid) {
 
-   return uuid.replace(/([0-9a-fA-F]{8})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]+)/, '$1-$2-$3-$4-$5');
- }
+  return uuid.replace(/([0-9a-fA-F]{8})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]+)/, '$1-$2-$3-$4-$5');
+}
 
- function getUUIDWithName(name, callback) {
+function getUUIDWithName(name, callback) {
 
-   request({
-     url: 'https://api.mojang.com/profiles/minecraft',
-     method: 'post',
-     body: [
-       name
-     ],
-     json: true
-   }, function (err, res, body) {
+  request({
+    url: 'https://api.mojang.com/profiles/minecraft',
+    method: 'post',
+    body: [
+      name
+    ],
+    json: true
+  }, function (err, res, body) {
 
-     if (err) {
-       callback(err);
-     }
-     else {
-       callback(null, getUUIDWithDash(body[0].id));
-     }
-   });
- }
+      if (err) {
+        callback(err);
+      }
+      else {
+        callback(null, getUUIDWithDash(body[0].id));
+      }
+  });
+}
 
 
 /*
- * Bot related
- */
+* Bot related
+*/
 
- getAPIAddress(function (target) {
+getAPIAddress(function (target) {
 
-   var server = restify.createServer();
+  var server = restify.createServer();
 
-   server.get('/api/ban/:alt', function (req, res, next) {
+  server.get('/api/ban/:alt', function (req, res, next) {
 
-     if (req.params.alt.length != 16) {
-       res.json({
-         status: 'error',
-         error: 'The ALT-Token has to be 16 chars long!'
-       });
-     }
-     else {
-       getAltStatus(target, req.params.alt, function (err, name) {
+    if (req.params.alt.length != 16) {
+      res.send(400, {
+        status: 'error',
+        error: 'The ALT-Token has to be 16 chars long!'
+      });
+    }
+    else {
+      getAltStatus(target, req.params.alt, function (err, name) {
 
-         if (err) {
-           res.json({
-             status: 'error',
-             error: err
-           });
-         }
-         else {
-           getUUIDWithName(name, function (err, uuid) {
+        if (err) {
+          res.send(500, {
+            status: 'error',
+            error: err
+          });
+        }
+        else {
+          getUUIDWithName(name, function (err, uuid) {
 
-             if (err) {
-               res.json({
-                 status: 'error',
-                 error: err
-               });
-             }
-             else {
-               var isPresent = db.get('players').find(function (o) {
-                 return o == uuid;
-               }).value();
+            if (err) {
+              res.send(500, {
+                status: 'error',
+                error: err
+              });
+            }
+            else {
+              var isPresent = db.get('players').find(function (o) {
+                return o == uuid;
+              }).value();
 
-               if (isPresent) {
-                 res.json({
-                   status: 'error',
-                   error: 'This hacked account is already in the database!'
-                 });
-               }
-               else {
-                 db.get('players').push(uuid).value();
+              if (isPresent) {
+                res.send(304, {
+                  status: 'already',
+                  error: 'This hacked account is already in the database!'
+                });
+              }
+              else {
+                db.get('players').push(uuid).value();
 
-                 console.log('Added in the database: ' + uuid + ' (ALT-Token: ' + req.params.alt + ')');
+                console.log('Added in the database: ' + uuid + ' (ALT-Token: ' + req.params.alt + ')');
 
-                 res.json({
-                   status: 'ok'
-                 });
-               }
-             }
-           });
-         }
-       });
-     }
+                res.send(201, {
+                  status: 'ok',
+                  player: {
+                    name: name,
+                    uuid: uuid
+                  }
+                });
+              }
+            }
+          });
+        }
+      });
+    }
 
-     next();
-   });
+    next();
+  });
 
-   server.get('/api/check/:uuid', function (req, res, next) {
+  server.get('/api/check/:uuid', function (req, res, next) {
 
-     var isExisting = db.get('players').find(function (o) {
-       return o == req.params.uuid;
-     }).value();
+    var isExisting = db.get('players').find(function (o) {
+      return o == req.params.uuid;
+    }).value();
 
-     res.json({
-       exists: (isExisting ? 'true' : 'false')
-     });
+    res.send(200, {
+      exists: (isExisting ? 'true' : 'false')
+    });
 
-     next();
-   });
+    next();
+  });
 
-   server.get('/api/stats', function (req, res, next) {
+  server.get('/api/stats', function (req, res, next) {
 
-     res.json({
-       players: db.get('players').size().value()
-     });
+    res.send(200, {
+      players: db.get('players').size().value()
+    });
 
-     next();
-   });
+    next();
+  });
 
-   server.use(restify.queryParser());
+  server.get(/.*/, restify.serveStatic({
+  	'directory': './docs/',
+  	'default': 'index.html'
+  }));
 
-   server.listen(6450, function () {
+  server.use(restify.queryParser());
 
-     console.log('Target is: ' + target);
-     console.log('%s listening at %s', server.name, server.url);
-   });
- });
+  server.listen(6450, function () {
+
+    console.log('Target is: ' + target);
+    console.log('%s listening at %s', server.name, server.url);
+  });
+});

@@ -1,0 +1,157 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "DOHA API",
+        "description": "Database Of Hacked Accounts",
+        "version": "1.0.0"
+    },
+    "host": "doha.blueslime.fr",
+    "schemes": [
+        "https"
+    ],
+    "basePath": "/api",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/stats": {
+            "get": {
+                "summary": "General statistics",
+                "description": "This endpoint return the global statistics related to the database. Actually\nonly the number of banned players.\n",
+                "responses": {
+                    "200": {
+                        "description": "A JSON object",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "players": {
+                                    "type": "number",
+                                    "description": "The number of banned players present in the database."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/check/{uuid}": {
+            "get": {
+                "summary": "Check if a given player exists in the database",
+                "description": "This endpoint check if the given player UUID exists in the database.\n",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "Specifies the player UUID to check",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A JSON object",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "exists": {
+                                    "type": "boolean",
+                                    "description": "Existence of the player in the database."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ban/{alt}": {
+            "get": {
+                "summary": "Add a player in the database",
+                "description": "This endpoint will try to authenticate to the MCLeaks's Endpoint Server\nwith the given ALT-Token. If successful, the real UUID will be fetched from\nMojang's servers and it will be added to the database. In case of any error,\nthe message will be returned as a response.\n",
+                "parameters": [
+                    {
+                        "name": "alt",
+                        "in": "path",
+                        "description": "Specifies the ALT-Token to ban",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "The player have been successfully banned.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string",
+                                    "description": "Response's status (here 'ok')."
+                                },
+                                "player": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "Username of the banned player."
+                                        },
+                                        "uuid": {
+                                            "type": "string",
+                                            "description": "Unique identifier of the banned player."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "The player was already in the database.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string",
+                                    "description": "Response' status (here 'already')."
+                                },
+                                "error": {
+                                    "type": "string",
+                                    "description": "Response's error message (here 'This hacked account is already in the database!')"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The given ALT-Token isn't valid (has to be 16 chars long).",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string",
+                                    "description": "Response' status (here 'error')."
+                                },
+                                "error": {
+                                    "type": "string",
+                                    "description": "Response's error message (here 'The ALT-Token has to be 16 chars long!')."
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An Internal Server Error occured during the process.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string",
+                                    "description": "Response' status (here 'error')."
+                                },
+                                "error": {
+                                    "type": "string",
+                                    "description": "Response's error message."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
