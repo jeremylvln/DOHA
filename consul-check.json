@@ -1,0 +1,9 @@
+{
+  "check": {
+    "id": "doha-api",
+    "name": "DOHA on port 6450",
+    "http": "http://localhost:6450/",
+    "interval": "10s",
+    "timeout": "3s"
+  }
+}
