@@ -45,3 +45,8 @@ jspm_packages
 
 # Yarn Integrity file
 .yarn-integrity
+
+# Google Chrome extension
+chrome
+chrome.crx
+chrome.pem

@@ -43,3 +43,6 @@ https://doha.blueslime.fr/api/ban/<ALT-TOKEN>
 
 If the token is still valid, the account will be added to the database and be blacklisted
 immediately (it can take 1 hour to update this repository—crontab yee).
+
+Also, we created a Google Chrome extension to help us and it's works very well! All the explainations
+on the [Google Chrome Web Store](https://chrome.google.com/webstore/detail/pkpmimofidjihldcbiglijhbdfiminob).
