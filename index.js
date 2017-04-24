@@ -81,6 +81,11 @@ function randomString(length) {
   return text;
 }
 
+function getIPAddressFromRequest(req) {
+
+  return req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+}
+
 function getUUIDWithDash(uuid) {
 
   return uuid.replace(/([0-9a-fA-F]{8})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]+)/, '$1-$2-$3-$4-$5');
@@ -127,6 +132,8 @@ getAPIAddress(function (target) {
       getAltStatus(target, req.params.alt, function (err, name) {
 
         if (err) {
+          console.log('Failed to retreive ALT-Token status: ' + err + ' (from ' + getIPAddressFromRequest(req) + ')');
+
           res.send(500, {
             status: 'error',
             error: err
@@ -136,6 +143,8 @@ getAPIAddress(function (target) {
           getUUIDWithName(name, function (err, uuid) {
 
             if (err) {
+              console.log('Failed to retreive the UUID according to the ALT-Token: ' + err + ' (from' + getIPAddressFromRequest(req) + ')');
+
               res.send(500, {
                 status: 'error',
                 error: err
@@ -147,6 +156,8 @@ getAPIAddress(function (target) {
               }).value();
 
               if (isPresent) {
+                console.log('Already in the database: ' + uuid + ' (ALT-Token: ' + req.params.alt + ') (from ' + getIPAddressFromRequest(req) + ')');
+
                 res.send(304, {
                   status: 'already',
                   error: 'This hacked account is already in the database!'
@@ -155,7 +166,7 @@ getAPIAddress(function (target) {
               else {
                 db.get('players').push(uuid).value();
 
-                console.log('Added in the database: ' + uuid + ' (ALT-Token: ' + req.params.alt + ')');
+                console.log('Added in the database: ' + uuid + ' (ALT-Token: ' + req.params.alt + ') (from ' + getIPAddressFromRequest(req) + ')');
 
                 res.send(201, {
                   status: 'ok',
