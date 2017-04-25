@@ -31,6 +31,18 @@ answers,
 ```
 
 
+## Do you think that you will break my server?
+
+If you are a -big- Minecraft server and you think that you will make easily 100k requests a day, this section is
+for you!
+
+In your case, it's maybe easier for you, and more friendly for my server, to cache locally the database (located
+in the [db.json](db.json) file). Don't forget to refresh your cache from time to time to get the new players from
+the list.
+
+Feel free to contact me if you have any questions about how to create this cache.
+
+
 ## Contributing
 
 This is a public database, and even if we are working on a bot to automatically fill
@@ -46,3 +58,8 @@ immediately (it can take 1 hour to update this repository—crontab yee).
 
 Also, we created a Google Chrome extension to help us and it's works very well! All the explainations
 on the [Google Chrome Web Store](https://chrome.google.com/webstore/detail/pkpmimofidjihldcbiglijhbdfiminob).
+
+
+## Author
+
+Jérémy L. (IamBlueSlime) - [Website](https://blueslime.fr) - [Twitter](https://twitter.com/iamblueslime)
