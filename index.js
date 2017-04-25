@@ -9,7 +9,6 @@
 var fs = require('fs');
 var restify = require('restify');
 var request = require('request');
-var tor = require('tor-request');
 
 var low = require('lowdb');
 var db = low('db.json', {
@@ -18,6 +17,7 @@ var db = low('db.json', {
 
 db.defaults({ players: [] }).value();
 
+var config = require('./config.json');
 
 /**
 * MCLeaks's API related
@@ -25,12 +25,16 @@ db.defaults({ players: [] }).value();
 
 function getAPIAddress(callback) {
 
-  tor.request('https://api.mcleaks.net/authenticator.php', {
-    json: true
+  request({
+    url: 'https://api.mcleaks.net/authenticator.php',
+    json: true,
+    proxy: config.proxy
   }, function (err, res, body) {
 
     if (err || !body.serverip) {
-      console.err('Failed to retreive the MCLeaks\'s fake login server!');
+      console.log('Failed to retreive the MCLeaks\'s fake login server!');
+      console.log(err);
+
       process.exit(1);
     }
     else {
@@ -41,7 +45,8 @@ function getAPIAddress(callback) {
 
 function getAltStatus(target, alt, callback) {
 
-  tor.request('https://' + target + '/authenticate', {
+  request({
+    url: 'https://' + target + '/authenticate',
     method: 'post',
     body: {
       username: alt,
@@ -49,7 +54,8 @@ function getAltStatus(target, alt, callback) {
     },
     rejectUnhauthorized: false,
     strictSSL: false,
-    json: true
+    json: true,
+    proxy: config.proxy
   }, function (err, res, body) {
 
     if (err) {

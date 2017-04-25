@@ -50,3 +50,4 @@ jspm_packages
 chrome
 chrome.crx
 chrome.pem
+config.json
