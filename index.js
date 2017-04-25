@@ -9,6 +9,7 @@
 var fs = require('fs');
 var restify = require('restify');
 var request = require('request');
+var tor = require('tor-request');
 
 var low = require('lowdb');
 var db = low('db.json', {
@@ -24,8 +25,7 @@ db.defaults({ players: [] }).value();
 
 function getAPIAddress(callback) {
 
-  request({
-    url: 'https://api.mcleaks.net/authenticator.php',
+  tor.request('https://api.mcleaks.net/authenticator.php', {
     json: true
   }, function (err, res, body) {
 
@@ -41,8 +41,7 @@ function getAPIAddress(callback) {
 
 function getAltStatus(target, alt, callback) {
 
-  request({
-    url: 'https://' + target + '/authenticate',
+  tor.request('https://' + target + '/authenticate', {
     method: 'post',
     body: {
       username: alt,
@@ -208,8 +207,8 @@ getAPIAddress(function (target) {
   });
 
   server.get(/.*/, restify.serveStatic({
-  	'directory': './docs/',
-  	'default': 'index.html'
+    'directory': './docs/',
+    'default': 'index.html'
   }));
 
   server.use(restify.queryParser());

@@ -19,6 +19,7 @@
   "dependencies": {
     "lowdb": "^0.14.0",
     "request": "^2.79.0",
-    "restify": "^4.3.0"
+    "restify": "^4.3.0",
+    "tor-request": "^1.0.6"
   }
 }
