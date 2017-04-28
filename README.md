@@ -30,10 +30,13 @@ answers,
 }
 ```
 
+## I'm lazy, but still want DOHA to protect my server.
 
-## Do you think that you will break my server?
+The very generous and hansome timmyRS has written [the BungeeCord Plugin "Anti-MCLeaks"](https://github.com/timmyrs/Anti-MCLeaks) you only need to download and install. Better instructions on his Github Repo.
 
-If you are a -big- Minecraft server and you think that you will make easily 100k requests a day, this section is
+## Will this break my server?
+
+If you are a **big** Minecraft server and you think that you will make easily 100k requests a day, this section is
 for you!
 
 In your case, it's maybe easier for you, and more friendly for my server, to cache locally the database (located
