@@ -1,5 +1,7 @@
 # Database Of Hacked Accounts
 
+## This database can contains false positives. Since I don't really have the time to work on this project, I prefer add this big warning. Maybe in a near future I will continue to fight...
+
 Nowadays, people cheat a lot in Minecraft. As they want to play more and cheat even more, websites
 like MCLeaks provides Minecraft accounts for free. This is a problem: it means a cheater is able to
 reconnect indefinitely to a server—maybe your own!—and continue to cheat. Even if these services are
